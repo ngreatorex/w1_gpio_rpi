@@ -1,3 +1,10 @@
+/*
+ * Raspberry Pi 1-wire GPIO module
+ *
+ * Based on the work of Frank Buss https://github.com/FrankBuss/linux-1/tree/rpi-w1
+ *
+ */
+
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/w1-gpio.h>
@@ -5,10 +12,10 @@
 
 #define VERSION "0.1"
 
-static unsigned int w1_gpio_pin = 4;
+static unsigned int pin = 4; /* Default to pin 4 */
 
-module_param(w1_gpio_pin, uint, 0444);
-MODULE_PARM_DESC(w1_gpio_pin, "GPIO pin to use for 1-wire data");
+module_param(pin, uint, 0444);
+MODULE_PARM_DESC(pin, "GPIO pin to use for 1-wire data");
 
 static struct w1_gpio_platform_data pdata = {
 	.pin = 0,
@@ -34,15 +41,15 @@ static int __init w1_gpio_rpi_init(void)
 {
 	int err;
 
-	printk("Raspberry Pi 1-wire GPIO " VERSION ": initialising on pin %d\n", w1_gpio_pin);
+	printk("Raspberry Pi 1-wire GPIO v" VERSION ": initialising on pin %d\n", pin);
 
-	pdata.pin = w1_gpio_pin;
+	pdata.pin = pin;
 	
 	err = platform_device_register(&pdev);
 	if (err) 
 		goto err;
 
-	printk("Raspberry Pi 1-wire GPIO" VERSION ": platform device registered\n");
+	printk("Raspberry Pi 1-wire GPIO v" VERSION ": platform device registered\n");
 	return 0;
 
 err:
@@ -51,7 +58,7 @@ err:
 
 static void __exit w1_gpio_rpi_exit(void)
 {
-	printk("Raspberry Pi 1-wire GPIO" VERSION ": unloading\n");
+	printk("Raspberry Pi 1-wire GPIO v" VERSION ": unloading\n");
 
 	platform_device_unregister(&pdev);
 
